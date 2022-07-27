@@ -35,6 +35,7 @@ private:
     QAction *cameraInfoAction;
     QAction *openCameraAction;
     QAction *exitAction;
+    QAction *calcFPSAction;
 
     QGraphicsScene *imageScene;
     QGraphicsView *imageView;
@@ -61,5 +62,7 @@ private slots:
     void showCameraInfo();
     void openCamera();
     void updateFrame(cv::Mat *mat);
+    void calculateFPS();
+    void updateFPS(float fps);
 };
 #endif // MAINWINDOW_H

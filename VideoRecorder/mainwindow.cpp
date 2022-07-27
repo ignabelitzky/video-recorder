@@ -57,15 +57,18 @@ void MainWindow::createActions()
 {
     cameraInfoAction = new QAction("Camera Info", this);
     openCameraAction = new QAction("Open Camera", this);
+    calcFPSAction = new QAction("&Calculate FPS", this);
     exitAction = new QAction("E&xit");
 
     fileMenu->addAction(cameraInfoAction);
     fileMenu->addAction(openCameraAction);
+    fileMenu->addAction(calcFPSAction);
     fileMenu->addAction(exitAction);
 
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(cameraInfoAction, SIGNAL(triggered(bool)), this, SLOT(showCameraInfo()));
     connect(openCameraAction, SIGNAL(triggered(bool)), this, SLOT(openCamera()));
+    connect(calcFPSAction, SIGNAL(triggered(bool)), this, SLOT(calculateFPS()));
 }
 
 void MainWindow::showCameraInfo()
@@ -87,9 +90,11 @@ void MainWindow::openCamera()
         capturer->setRunning(false);
         disconnect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
         connect(capturer, &CaptureThread::finished, capturer, &CaptureThread::deleteLater);
+        disconnect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
     }
     int camID = 0;
     capturer = new CaptureThread(camID, data_lock);
+    connect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
     connect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing camera %1").arg(camID));
@@ -109,4 +114,16 @@ void MainWindow::updateFrame(cv::Mat *mat)
     imageScene->addPixmap(image);
     imageScene->update();
     imageView->setSceneRect(image.rect());
+}
+
+void MainWindow::calculateFPS()
+{
+    if(capturer != nullptr) {
+        capturer->startCalcFPS();
+    }
+}
+
+void MainWindow::updateFPS(float fps)
+{
+    mainStatusLabel->setText(QString("FPS of current camera is %1").arg(fps));
 }

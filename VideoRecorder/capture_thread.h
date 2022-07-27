@@ -4,6 +4,7 @@
 #include <QString>
 #include <QThread>
 #include <QMutex>
+#include <QElapsedTimer>
 #include "opencv2/opencv.hpp"
 
 class CaptureThread : public QThread
@@ -14,12 +15,17 @@ public:
     CaptureThread(QString videoPath, QMutex *lock);
     ~CaptureThread();
     void setRunning(bool run) { running = run; }
+    void startCalcFPS() { fps_calculating = true; }
+
+private:
+    void calculateFPS(cv::VideoCapture &cap);
 
 protected:
     void run() override;
 
 signals:
     void frameCaptured(cv::Mat *data);
+    void fpsChanged(float fps);
 
 private:
     bool running;
@@ -27,6 +33,10 @@ private:
     QString videoPath;
     QMutex *data_lock;
     cv::Mat frame;
+
+    // FPS calculating
+    bool fps_calculating;
+    float fps;
 };
 
 #endif // CAPTURE_THREAD_H
