@@ -13,6 +13,13 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QGridLayout>
+#include <QPixmap>
+#include <QMediaDevices>
+#include <QCameraDevice>
+#include <QMessageBox>
+#include <QMutex>
+#include "opencv2/opencv.hpp"
+#include "capture_thread.h"
 
 class MainWindow : public QMainWindow
 {
@@ -40,12 +47,19 @@ private:
     QStatusBar *mainStatusBar;
     QLabel *mainStatusLabel;
 
+    cv::Mat currentFrame;
+
+    // for capture thread
+    QMutex *data_lock;
+    CaptureThread *capturer;
+
 private:
     void initUI();
     void createActions();
 
 private slots:
-    void cameraInformation();
+    void showCameraInfo();
     void openCamera();
+    void updateFrame(cv::Mat *mat);
 };
 #endif // MAINWINDOW_H
