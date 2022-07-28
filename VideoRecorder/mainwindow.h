@@ -71,5 +71,6 @@ private slots:
     void updateFPS(float fps);
     void recordingStartStop();
     void appendSavedVideo(QString name);
+    void updateMonitorStatus(int status);
 };
 #endif // MAINWINDOW_H
