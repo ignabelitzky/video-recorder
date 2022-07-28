@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     initUI();
     capturer = nullptr;
     data_lock = new QMutex();
+    populateSavedList();
 }
 
 MainWindow::~MainWindow()
@@ -85,7 +86,21 @@ void MainWindow::createActions()
 
 void MainWindow::populateSavedList()
 {
-    qDebug() << "TO-DO: populateSavedList method!!!";
+    QDir dir(Utilities::getDataPath());
+    QStringList nameFilters;
+    nameFilters << "*.jpg";
+    QFileInfoList files = dir.entryInfoList(nameFilters,
+                                            QDir::NoDotAndDotDot | QDir::Files,
+                                            QDir::Name);
+    foreach(QFileInfo cover, files) {
+        QString name = cover.baseName();
+        QStandardItem *item = new QStandardItem();
+        list_model->appendRow(item);
+        QModelIndex index = list_model->indexFromItem(item);
+        list_model->setData(index, QPixmap(cover.absoluteFilePath()).scaledToHeight(145),
+                            Qt::DecorationRole);
+        list_model->setData(index, name, Qt::DisplayRole);
+    }
 }
 
 void MainWindow::showCameraInfo()
