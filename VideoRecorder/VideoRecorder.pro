@@ -11,15 +11,17 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 SOURCES += \
     capture_thread.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    utilities.cpp
 
 HEADERS += \
     capture_thread.h \
-    mainwindow.h
+    mainwindow.h \
+    utilities.h
 
 unix: !mac {
     INCLUDEPATH += /usr/include/opencv4
-    LIBS += -L/usr/include/opencv/lib -lopencv_core -lopencv_imgproc -lopencv_video -lopencv_videoio
+    LIBS += -L/usr/include/opencv/lib -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -lopencv_video -lopencv_videoio
 }
 
 # Default rules for deployment.

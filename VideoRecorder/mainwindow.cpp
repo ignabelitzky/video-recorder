@@ -36,6 +36,8 @@ void MainWindow::initUI()
     tools_layout->addWidget(recordButton, 0, 1, Qt::AlignHCenter);
     tools_layout->addWidget(new QLabel(this), 0, 2);
 
+    connect(recordButton, SIGNAL(clicked(bool)), this, SLOT(recordingStartStop()));
+
     // list of saved videos
     saved_list = new QListView(this);
     main_layout->addWidget(saved_list, 13, 0, 4, 1);
@@ -51,6 +53,16 @@ void MainWindow::initUI()
     mainStatusLabel->setText("Video Recorder is ready");
 
     createActions();
+
+    // list of saved videos
+    saved_list = new QListView(this);
+    saved_list->setViewMode(QListView::IconMode);
+    saved_list->setResizeMode(QListView::Adjust);
+    saved_list->setSpacing(5);
+    saved_list->setWrapping(false);
+    list_model = new QStandardItemModel(this);
+    saved_list->setModel(list_model);
+    main_layout->addWidget(saved_list, 13, 0, 4, 1);
 }
 
 void MainWindow::createActions()
@@ -69,6 +81,11 @@ void MainWindow::createActions()
     connect(cameraInfoAction, SIGNAL(triggered(bool)), this, SLOT(showCameraInfo()));
     connect(openCameraAction, SIGNAL(triggered(bool)), this, SLOT(openCamera()));
     connect(calcFPSAction, SIGNAL(triggered(bool)), this, SLOT(calculateFPS()));
+}
+
+void MainWindow::populateSavedList()
+{
+    qDebug() << "TO-DO: populateSavedList method!!!";
 }
 
 void MainWindow::showCameraInfo()
@@ -91,11 +108,13 @@ void MainWindow::openCamera()
         disconnect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
         connect(capturer, &CaptureThread::finished, capturer, &CaptureThread::deleteLater);
         disconnect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
+        disconnect(capturer, &CaptureThread::videoSaved, this, &MainWindow::appendSavedVideo);
     }
     int camID = 0;
     capturer = new CaptureThread(camID, data_lock);
     connect(capturer, &CaptureThread::fpsChanged, this, &MainWindow::updateFPS);
     connect(capturer, &CaptureThread::frameCaptured, this, &MainWindow::updateFrame);
+    connect(capturer, &CaptureThread::videoSaved, this, &MainWindow::appendSavedVideo);
     capturer->start();
     mainStatusLabel->setText(QString("Capturing camera %1").arg(camID));
 }
@@ -126,4 +145,28 @@ void MainWindow::calculateFPS()
 void MainWindow::updateFPS(float fps)
 {
     mainStatusLabel->setText(QString("FPS of current camera is %1").arg(fps));
+}
+
+void MainWindow::recordingStartStop()
+{
+    QString text = recordButton->text();
+    if(text == "Record" && capturer != nullptr) {
+        capturer->setVideoSavingStatus(CaptureThread::STARTING);
+        recordButton->setText("Stop Recording");
+    } else if(text == "Stop Recording" && capturer != nullptr) {
+        capturer->setVideoSavingStatus(CaptureThread::STOPPING);
+        recordButton->setText("Record");
+    }
+}
+
+void MainWindow::appendSavedVideo(QString name)
+{
+    QString cover = Utilities::getSavedVideoPath(name, "jpg");
+    QStandardItem *item = new QStandardItem();
+    list_model->appendRow(item);
+    QModelIndex index = list_model->indexFromItem(item);
+    list_model->setData(index, QPixmap(cover).scaledToHeight(145),
+                        Qt::DecorationRole);
+    list_model->setData(index, name, Qt::DisplayRole);
+    saved_list->scrollTo(index);
 }

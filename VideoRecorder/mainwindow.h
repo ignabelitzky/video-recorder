@@ -18,8 +18,10 @@
 #include <QCameraDevice>
 #include <QMessageBox>
 #include <QMutex>
+#include <QStandardItemModel>
 #include "opencv2/opencv.hpp"
 #include "capture_thread.h"
+#include "utilities.h"
 
 class MainWindow : public QMainWindow
 {
@@ -54,9 +56,12 @@ private:
     QMutex *data_lock;
     CaptureThread *capturer;
 
+    QStandardItemModel *list_model;
+
 private:
     void initUI();
     void createActions();
+    void populateSavedList();
 
 private slots:
     void showCameraInfo();
@@ -64,5 +69,7 @@ private slots:
     void updateFrame(cv::Mat *mat);
     void calculateFPS();
     void updateFPS(float fps);
+    void recordingStartStop();
+    void appendSavedVideo(QString name);
 };
 #endif // MAINWINDOW_H
