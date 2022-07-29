@@ -69,20 +69,24 @@ void MainWindow::initUI()
 
 void MainWindow::createActions()
 {
-    cameraInfoAction = new QAction("Camera Info", this);
+    cameraInfoAction = new QAction("Camera &Info", this);
     openCameraAction = new QAction("Open Camera", this);
     calcFPSAction = new QAction("&Calculate FPS", this);
     exitAction = new QAction("E&xit");
+    aboutAction = new QAction("&About", this);
 
     fileMenu->addAction(cameraInfoAction);
     fileMenu->addAction(openCameraAction);
     fileMenu->addAction(calcFPSAction);
     fileMenu->addAction(exitAction);
 
+    helpMenu->addAction(aboutAction);
+
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(cameraInfoAction, SIGNAL(triggered(bool)), this, SLOT(showCameraInfo()));
     connect(openCameraAction, SIGNAL(triggered(bool)), this, SLOT(openCamera()));
     connect(calcFPSAction, SIGNAL(triggered(bool)), this, SLOT(calculateFPS()));
+    connect(aboutAction, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
 }
 
 void MainWindow::populateSavedList()
@@ -204,4 +208,12 @@ void MainWindow::updateMonitorStatus(int status)
         capturer->setMotionDetectingStatus(false);
         recordButton->setEnabled(true);
     }
+}
+
+void MainWindow::showAbout()
+{
+    QString text = "Desktop application developed by\n";
+    text += "Ignacio Belitzky\n\n";
+    text += "License: GNU General Public License v3";
+    QMessageBox::information(this, "About", text);
 }

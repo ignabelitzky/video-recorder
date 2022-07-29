@@ -38,6 +38,7 @@ private:
     QAction *openCameraAction;
     QAction *exitAction;
     QAction *calcFPSAction;
+    QAction *aboutAction;
 
     QGraphicsScene *imageScene;
     QGraphicsView *imageView;
@@ -72,5 +73,6 @@ private slots:
     void recordingStartStop();
     void appendSavedVideo(QString name);
     void updateMonitorStatus(int status);
+    void showAbout();
 };
 #endif // MAINWINDOW_H
