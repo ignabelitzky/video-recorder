@@ -72,7 +72,7 @@ void MainWindow::createActions()
     cameraInfoAction = new QAction("Camera &Info", this);
     openCameraAction = new QAction("Open Camera", this);
     calcFPSAction = new QAction("&Calculate FPS", this);
-    exitAction = new QAction("E&xit");
+    exitAction = new QAction("E&xit", this);
     aboutAction = new QAction("&About", this);
 
     fileMenu->addAction(cameraInfoAction);
